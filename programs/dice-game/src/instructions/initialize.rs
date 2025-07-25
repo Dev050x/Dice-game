@@ -26,7 +26,7 @@ impl<'info> Initialize<'info> {
             },
         );
 
-        transfer(cpiContext, amount);
+        transfer(cpiContext, amount)?;
 
         Ok(())
     }

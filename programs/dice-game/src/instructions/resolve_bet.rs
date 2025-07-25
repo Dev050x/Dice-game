@@ -11,9 +11,10 @@ pub const HOUSE_EDGE: u16 = 150;
 #[derive(Accounts)]
 pub struct ResolveBet<'info> {
     #[account(mut)]
-    pub player: Signer<'info>,
+    pub house: Signer<'info>,
+    #[account(mut)]
     /// CHECK: This is safe
-    pub house: UncheckedAccount<'info>,
+    pub player: UncheckedAccount<'info>,
     /// CHECK: House is checked Manually
     #[account(
         mut,
@@ -101,6 +102,7 @@ impl<'info> ResolveBet<'info> {
         let roll = lower.wrapping_add(upper).wrapping_rem(100) as u8 + 1;
 
         if self.bet.roll > roll {
+            msg!("player won");
             let payout = (self.bet.amount as u128)
                 .checked_mul(10000 - HOUSE_EDGE as u128).ok_or(DiceError::Overflow)?
                 .checked_div(self.bet.roll as u128 - 1).ok_or(DiceError::Overflow)?
@@ -116,7 +118,7 @@ impl<'info> ResolveBet<'info> {
                 from:self.vault.to_account_info(),
                 to:self.player.to_account_info()
             } , signer_seeds);
-            transfer(cpi_context, payout);
+            transfer(cpi_context, payout)?;
         }
 
         Ok(())

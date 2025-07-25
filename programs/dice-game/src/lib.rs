@@ -38,5 +38,5 @@ pub mod dice_game {
         ctx.accounts.verify_ed25519_signature(&sig)?;
         ctx.accounts.resolve_bet(&sig)?;
         Ok(())
-    }
+    } 
 }
