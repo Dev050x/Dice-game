@@ -9,11 +9,12 @@ use crate::{error::DiceError, Bet};
 pub const HOUSE_EDGE: u16 = 150;
 
 #[derive(Accounts)]
-pub struct PlaceBet<'info> {
+pub struct ResolveBet<'info> {
     #[account(mut)]
     pub player: Signer<'info>,
-    ///CHECk: This is safe
+    /// CHECK: This is safe
     pub house: UncheckedAccount<'info>,
+    /// CHECK: House is checked Manually
     #[account(
         mut,
         seeds = [b"vault" , house.key().as_ref()],
@@ -30,12 +31,12 @@ pub struct PlaceBet<'info> {
     #[account(
         address = solana_program::sysvar::instructions::ID
     )]
-    ///CHECK: This is safe
+    /// CHECK: This is safe
     pub instruction_sysvar: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }
 
-impl<'info> PlaceBet<'info> {
+impl<'info> ResolveBet<'info> {
     pub fn verify_ed25519_signature(&mut self, sig: &[u8]) -> Result<()> {
         //get the ed25519 signature
         let ix = load_instruction_at_checked(0, &self.instruction_sysvar.to_account_info())?;
@@ -89,7 +90,7 @@ impl<'info> PlaceBet<'info> {
         Ok(())
     }
 
-    pub fn resolve_bet(&mut self, bumps: &PlaceBetBumps, sig: &[u8]) -> Result<()> {
+    pub fn resolve_bet(&mut self,sig: &[u8]) -> Result<()> {
         let hash = hash(sig).to_bytes();
         let mut hash_16: [u8; 16] = [0; 16];
         hash_16.copy_from_slice(&hash[0..16]);

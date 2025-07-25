@@ -6,7 +6,7 @@ use crate::{error::DiceError, state::Bet};
 pub struct RefundBet<'info> {
     #[account(mut)]
     pub player: Signer<'info>,
-    ///CHECK: This is safe
+    /// CHECK: This is safe
     pub house: UncheckedAccount<'info>,
     #[account(
         mut,

@@ -1,4 +1,7 @@
-use anchor_lang::{prelude::*, system_program::{transfer, Transfer}};
+use anchor_lang::{
+    prelude::*,
+    system_program::{transfer, Transfer},
+};
 
 use crate::Bet;
 
@@ -7,7 +10,7 @@ use crate::Bet;
 pub struct PlaceBet<'info> {
     #[account(mut)]
     pub player: Signer<'info>,
-    ///Check: This is safe
+    /// CHECK: This is safe
     pub house: UncheckedAccount<'info>,
     #[account(
         mut,
@@ -27,7 +30,13 @@ pub struct PlaceBet<'info> {
 }
 
 impl<'info> PlaceBet<'info> {
-    pub fn create_bet(&mut self, seed:u128 , roll: u8 , amount:u64 , bumps:&PlaceBetBumps) -> Result<()> {
+    pub fn create_bet(
+        &mut self,
+        seed: u128,
+        roll: u8,
+        amount: u64,
+        bumps: &PlaceBetBumps,
+    ) -> Result<()> {
         self.bet.set_inner(Bet {
             player: self.player.key(),
             seed,
@@ -37,10 +46,13 @@ impl<'info> PlaceBet<'info> {
             bump: bumps.bet,
         });
 
-        let cpiContext = CpiContext::new(self.system_program.to_account_info(), Transfer{
-            from:self.player.to_account_info(),
-            to:self.vault.to_account_info()
-        });
+        let cpiContext = CpiContext::new(
+            self.system_program.to_account_info(),
+            Transfer {
+                from: self.player.to_account_info(),
+                to: self.vault.to_account_info(),
+            },
+        );
         transfer(cpiContext, amount)?;
 
         Ok(())
